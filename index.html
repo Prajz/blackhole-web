@@ -10,8 +10,8 @@
       content="BlackHole Web — paste a video link, see quality options, download the best. No backend."
     />
     <title>BlackHole Web · Video Downloader</title>
-    <script type="module" crossorigin src="./assets/index-Dq2mO5Xn.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-D7qfrFBV.css">
+    <script type="module" crossorigin src="./assets/index-CtmEzafR.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-DL_F5vse.css">
   </head>
   <body>
     <div id="app">
@@ -43,25 +43,48 @@
           <button class="chip" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">HLS · multi-quality</button>
           <button class="chip" data-url="https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8">HLS · Apple bipbop</button>
           <button class="chip" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">MP4 · direct</button>
+          <button class="chip" data-url="https://www.tiktok.com/@nicolly.divino/video/7649850626641317128">TikTok · needs cobalt</button>
         </div>
 
         <details class="settings">
-          <summary>Settings &amp; CORS proxy</summary>
+          <summary>Settings · backend &amp; proxy</summary>
           <div class="settings-body">
-            <label class="row">
-              <input id="use-proxy" type="checkbox" />
-              <span>Route fetches through a CORS proxy</span>
-            </label>
-            <p class="hint">
-              Required for cross-origin sources that block browser fetches (YouTube,
-              Instagram, TikTok, …). Without a proxy, only CORS-permitted direct
-              videos and HLS streams can be downloaded. Public proxies are
-              third-party and may rate-limit or break.
-            </p>
-            <label class="row stack">
-              <span>Proxy URL prefix</span>
-              <input id="proxy-url" type="text" value="https://corsproxy.io/?url=" spellcheck="false" />
-            </label>
+            <div class="settings-section">
+              <h3 class="settings-h">Cobalt backend <span class="settings-badge">for TikTok / IG / X / etc.</span></h3>
+              <p class="hint">
+                Social platforms (TikTok, Instagram, X, Facebook, Reddit…) use bot detection
+                that a browser can't bypass. A self-hosted <a href="https://github.com/imputnet/cobalt" target="_blank" rel="noopener">cobalt</a>
+                instance does the extraction server-side. Deploy your own free instance
+                via <a href="https://railway.com/deploy/cobalt-media-downloader" target="_blank" rel="noopener">Railway one-click</a>,
+                then paste its URL here. Everything below works automatically once set.
+              </p>
+              <label class="row stack">
+                <span>Cobalt instance URL</span>
+                <input id="cobalt-url" type="text" placeholder="https://your-cobalt.up.railway.app" spellcheck="false" />
+              </label>
+              <label class="row stack">
+                <span>API key (optional — only if your instance requires one)</span>
+                <input id="cobalt-key" type="text" placeholder="leave empty if none" spellcheck="false" />
+              </label>
+            </div>
+
+            <hr class="settings-divider" />
+
+            <div class="settings-section">
+              <h3 class="settings-h">CORS proxy <span class="settings-badge muted">legacy fallback</span></h3>
+              <label class="row">
+                <input id="use-proxy" type="checkbox" />
+                <span>Route fetches through a CORS proxy</span>
+              </label>
+              <p class="hint">
+                Only affects direct/HLS/YouTube client-side extraction. Does nothing for
+                social platforms (those use cobalt above). Public proxies may rate-limit.
+              </p>
+              <label class="row stack">
+                <span>Proxy URL prefix</span>
+                <input id="proxy-url" type="text" value="https://corsproxy.io/?url=" spellcheck="false" />
+              </label>
+            </div>
           </div>
         </details>
 
@@ -72,9 +95,10 @@
 
       <footer class="foot">
         <p>
-          No backend · runs entirely in your browser. Works fully for direct video
-          &amp; HLS streams. YouTube/IG/TikTok need a CORS proxy (toggle above) and
-          may be unreliable — that's a browser security limit, not a bug.
+          Direct video &amp; HLS work with no backend. TikTok / Instagram / X / Facebook
+          need a free self-hosted <a href="https://github.com/imputnet/cobalt" target="_blank" rel="noopener">cobalt</a>
+          instance — add its URL in Settings. Everything runs in your browser; no data
+          is stored server-side.
         </p>
       </footer>
     </div>
