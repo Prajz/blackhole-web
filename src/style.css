@@ -156,34 +156,6 @@ body {
   background: linear-gradient(180deg, #8a6dff, #6a4af6);
 }
 
-.examples {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin: 14px 0 4px;
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.chip {
-  appearance: none;
-  border: 1px solid var(--border);
-  background: #0d0d18;
-  color: var(--muted);
-  border-radius: 999px;
-  padding: 6px 12px;
-  font-size: 12.5px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.chip:hover {
-  color: var(--text);
-  border-color: var(--accent);
-  background: #15152a;
-}
-
 .settings {
   margin-top: 14px;
   border: 1px solid var(--border);

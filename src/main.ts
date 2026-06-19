@@ -62,13 +62,6 @@ form.addEventListener('submit', async (e) => {
   await runAnalyze(url)
 })
 
-document.querySelectorAll<HTMLButtonElement>('.chip').forEach((b) => {
-  b.addEventListener('click', () => {
-    urlInput.value = b.dataset.url || ''
-    runAnalyze(b.dataset.url || '')
-  })
-})
-
 async function runAnalyze(url: string) {
   resetUI()
   analyzeBtn.disabled = true
