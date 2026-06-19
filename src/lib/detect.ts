@@ -1,5 +1,38 @@
 import type { SourceKind } from './types'
 
+const SOCIAL_HOSTS: RegExp[] = [
+  /(^|\.)tiktok\.com$/,
+  /(^|\.)instagram\.com$/,
+  /(^|\.)x\.com$/,
+  /^twitter\.com$/,
+  /(^|\.)facebook\.com$/,
+  /(^|\.)fb\.watch$/,
+  /(^|\.)reddit\.com$/,
+  /(^|\.)v\.redd\.it$/,
+  /(^|\.)pinterest\.com$/,
+  /(^|\.)pin\.it$/,
+  /(^|\.)snapchat\.com$/,
+  /(^|\.)tumblr\.com$/,
+  /(^|\.)streamable\.com$/,
+  /(^|\.)twitch\.tv$/,
+  /(^|\.)clippit\.tv$/,
+  /(^|\.)bilibili\.com$/,
+  /(^|\.)dailymotion\.com$/,
+  /(^|\.)vimeo\.com$/,
+  /(^|\.)soundcloud\.com$/,
+  /(^|\.)pinterest\./,
+]
+
+export function isSocialUrl(url: string): boolean {
+  try {
+    const u = new URL(url.trim())
+    const host = u.hostname.replace(/^www\./, '')
+    return SOCIAL_HOSTS.some((re) => re.test(host))
+  } catch {
+    return false
+  }
+}
+
 export function detectSource(url: string): SourceKind {
   let u: URL
   try {
@@ -9,6 +42,7 @@ export function detectSource(url: string): SourceKind {
   }
   const host = u.hostname.replace(/^www\./, '')
   if (/(^|\.)youtube\.com$/.test(host) || host === 'youtu.be') return 'youtube'
+  if (isSocialUrl(url)) return 'social'
   const path = u.pathname.toLowerCase()
   if (path.endsWith('.m3u8') || path.includes('.m3u8')) return 'hls'
   if (path.endsWith('.mpd')) return 'hls' // DASH handled loosely as adaptive

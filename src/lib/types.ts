@@ -1,4 +1,4 @@
-export type SourceKind = 'direct' | 'hls' | 'youtube' | 'unknown'
+export type SourceKind = 'direct' | 'hls' | 'youtube' | 'social' | 'unknown'
 
 export interface Quality {
   id: string
@@ -13,9 +13,10 @@ export interface Quality {
   container?: string
   size?: number
   url: string
-  kind: 'video' | 'audio' | 'combined'
+  kind: 'video' | 'audio' | 'combined' | 'photo'
   source: SourceKind
   notes?: string
+  thumb?: string
   download: (onProgress?: (pct: number, label: string) => void) => Promise<void>
 }
 
@@ -26,10 +27,16 @@ export interface AnalyzeResult {
   previewUrl?: string
   isHls?: boolean
   needsProxy?: boolean
+  needsCobalt?: boolean
   warning?: string
 }
 
 export interface ProxyConfig {
   enabled: boolean
   url: string
+}
+
+export interface CobaltConfig {
+  url: string
+  apiKey?: string
 }

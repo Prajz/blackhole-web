@@ -3,17 +3,54 @@ import { fetchText, fetchBlob, triggerBlobDownload, sanitizeFilename, isCorsErro
 import { parseM3u8, hlsVariantToQuality, downloadHlsVariant } from './m3u8'
 import { probeVideo } from './probe'
 import { analyzeYouTube } from './youtube'
-import type { AnalyzeResult, ProxyConfig, Quality } from './types'
+import { analyzeWithCobalt, cobaltEnabled } from './cobalt'
+import type { AnalyzeResult, CobaltConfig, ProxyConfig, Quality } from './types'
 
 export async function analyze(
   url: string,
   proxy: ProxyConfig,
+  cobalt: CobaltConfig,
   onProgress: (pct: number, label: string) => void,
 ): Promise<AnalyzeResult> {
   const source = detectSource(url)
   const cleanUrl = url.trim()
 
+  if (source === 'social') {
+    if (!cobaltEnabled(cobalt)) {
+      return {
+        source: 'social',
+        qualities: [],
+        needsCobalt: true,
+        warning:
+          'TikTok, Instagram, X, and other social platforms require a backend to bypass bot detection. Open Settings → "Cobalt backend" and paste your self-hosted cobalt instance URL. See the link there for one-click deploy.',
+      }
+    }
+    const result = await analyzeWithCobalt(cleanUrl, cobalt, proxy)
+    return {
+      source: 'social',
+      title: result.title,
+      qualities: result.qualities,
+      previewUrl: cleanUrl,
+      warning: result.warning,
+      needsCobalt: !result.qualities.length,
+    }
+  }
+
   if (source === 'youtube') {
+    // If cobalt is configured, prefer it for YouTube too (more reliable).
+    if (cobaltEnabled(cobalt)) {
+      const result = await analyzeWithCobalt(cleanUrl, cobalt, proxy)
+      if (result.qualities.length) {
+        return {
+          source: 'social',
+          title: result.title,
+          qualities: result.qualities,
+          previewUrl: cleanUrl,
+          warning: result.warning,
+        }
+      }
+      // cobalt failed — fall through to client-side extraction
+    }
     const yt = await analyzeYouTube(cleanUrl, proxy, onProgress)
     return {
       source: 'youtube',

@@ -2,7 +2,7 @@ import Hls from 'hls.js'
 import { analyze } from './lib/analyze'
 import { rank, pickBest, formatBytes, formatDuration } from './lib/best'
 import { isCorsError } from './lib/fetcher'
-import type { AnalyzeResult, ProxyConfig, Quality } from './lib/types'
+import type { AnalyzeResult, CobaltConfig, ProxyConfig, Quality } from './lib/types'
 import './style.css'
 
 const $ = <T extends HTMLElement = HTMLElement>(id: string): T => document.getElementById(id) as T
@@ -15,6 +15,8 @@ const previewEl = $('preview')
 const qualitiesEl = $('qualities')
 const useProxy = $<HTMLInputElement>('use-proxy')
 const proxyUrl = $<HTMLInputElement>('proxy-url')
+const cobaltUrl = $<HTMLInputElement>('cobalt-url')
+const cobaltKey = $<HTMLInputElement>('cobalt-key')
 
 let currentHls: Hls | null = null
 let activeDownload: { quality: Quality; btn: HTMLButtonElement } | null = null
@@ -22,6 +24,36 @@ let activeDownload: { quality: Quality; btn: HTMLButtonElement } | null = null
 function proxyConfig(): ProxyConfig {
   return { enabled: useProxy.checked, url: proxyUrl.value.trim() }
 }
+
+function cobaltConfig(): CobaltConfig {
+  return { url: cobaltUrl.value.trim(), apiKey: cobaltKey.value.trim() || undefined }
+}
+
+function saveSettings() {
+  try {
+    localStorage.setItem('bh-settings', JSON.stringify({
+      useProxy: useProxy.checked,
+      proxyUrl: proxyUrl.value,
+      cobaltUrl: cobaltUrl.value,
+      cobaltKey: cobaltKey.value,
+    }))
+  } catch { /* ignore */ }
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('bh-settings') || '{}')
+    if (s.useProxy) useProxy.checked = true
+    if (s.proxyUrl) proxyUrl.value = s.proxyUrl
+    if (s.cobaltUrl) cobaltUrl.value = s.cobaltUrl
+    if (s.cobaltKey) cobaltKey.value = s.cobaltKey
+  } catch { /* ignore */ }
+}
+
+loadSettings()
+;[useProxy, proxyUrl, cobaltUrl, cobaltKey].forEach((el) =>
+  el.addEventListener('change', saveSettings),
+)
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault()
@@ -42,7 +74,7 @@ async function runAnalyze(url: string) {
   analyzeBtn.disabled = true
   showStatus('Analyzing…', 'info')
   try {
-    const result = await analyze(url, proxyConfig(), (pct, label) => {
+    const result = await analyze(url, proxyConfig(), cobaltConfig(), (pct, label) => {
       // progress is for downloads, not analysis
     })
     renderResult(result)
@@ -55,7 +87,8 @@ async function runAnalyze(url: string) {
 
 function renderResult(r: AnalyzeResult) {
   if (r.warning && !r.qualities.length) {
-    showStatus(r.warning, r.needsProxy ? 'proxy' : 'error')
+    const kind: 'proxy' | 'error' | 'cobalt' = r.needsCobalt ? 'cobalt' : r.needsProxy ? 'proxy' : 'error'
+    showStatus(r.warning, kind)
     return
   }
   if (r.warning) {
@@ -104,8 +137,10 @@ function makeCard(q: Quality, isBest: boolean): HTMLElement {
 
   const left = document.createElement('div')
   left.className = 'card-main'
+  const thumb = q.thumb ? `<img class="card-thumb" src="${escapeHtml(q.thumb)}" alt="" loading="lazy" />` : ''
   left.innerHTML = `
     <div class="card-label">
+      ${thumb}
       ${isBest ? '<span class="badge">BEST</span>' : ''}
       <span class="ql">${escapeHtml(q.label)}</span>
     </div>
@@ -196,7 +231,7 @@ function resetUI() {
   activeDownload = null
 }
 
-function showStatus(msg: string, kind: 'info' | 'ok' | 'error' | 'proxy') {
+function showStatus(msg: string, kind: 'info' | 'ok' | 'error' | 'proxy' | 'cobalt') {
   statusEl.hidden = false
   statusEl.className = `status ${kind}`
   statusEl.textContent = msg
