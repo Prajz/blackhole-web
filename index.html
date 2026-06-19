@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta
+      name="description"
+      content="BlackHole Web — paste a video link, see quality options, download the best. No backend."
+    />
+    <title>BlackHole Web · Video Downloader</title>
+  </head>
+  <body>
+    <div id="app">
+      <header class="hero">
+        <div class="logo">
+          <span class="logo-mark" aria-hidden="true"></span>
+          <h1>BlackHole<span class="dim">Web</span></h1>
+        </div>
+        <p class="tagline">Paste a link. Pick a quality. Download the best one.</p>
+      </header>
+
+      <main class="panel">
+        <form id="analyze-form" class="form">
+          <input
+            id="url-input"
+            class="url-input"
+            type="url"
+            inputmode="url"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Paste a video or .m3u8 link…"
+            required
+          />
+          <button id="analyze-btn" class="btn primary" type="submit">Analyze</button>
+        </form>
+
+        <div class="examples">
+          <span>Try:</span>
+          <button class="chip" data-url="https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8">HLS · multi-quality</button>
+          <button class="chip" data-url="https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8">HLS · Apple bipbop</button>
+          <button class="chip" data-url="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4">MP4 · direct</button>
+        </div>
+
+        <details class="settings">
+          <summary>Settings &amp; CORS proxy</summary>
+          <div class="settings-body">
+            <label class="row">
+              <input id="use-proxy" type="checkbox" />
+              <span>Route fetches through a CORS proxy</span>
+            </label>
+            <p class="hint">
+              Required for cross-origin sources that block browser fetches (YouTube,
+              Instagram, TikTok, …). Without a proxy, only CORS-permitted direct
+              videos and HLS streams can be downloaded. Public proxies are
+              third-party and may rate-limit or break.
+            </p>
+            <label class="row stack">
+              <span>Proxy URL prefix</span>
+              <input id="proxy-url" type="text" value="https://corsproxy.io/?url=" spellcheck="false" />
+            </label>
+          </div>
+        </details>
+
+        <div id="status" class="status" hidden></div>
+        <div id="preview" class="preview" hidden></div>
+        <div id="qualities" class="qualities" hidden></div>
+      </main>
+
+      <footer class="foot">
+        <p>
+          No backend · runs entirely in your browser. Works fully for direct video
+          &amp; HLS streams. YouTube/IG/TikTok need a CORS proxy (toggle above) and
+          may be unreliable — that's a browser security limit, not a bug.
+        </p>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

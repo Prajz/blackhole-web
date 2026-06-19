@@ -1,0 +1,20 @@
+{
+  "name": "blackhole-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "No-backend video downloader web app. Paste a link, pick a quality, download. Works fully for direct video + HLS streams.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "hls.js": "^1.5.20"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2",
+    "vite": "^7.0.3"
+  }
+}

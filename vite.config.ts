@@ -1,0 +1,11 @@
+import { defineConfig } from 'vite'
+
+export default defineConfig({
+  base: './',
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    target: 'es2020',
+    chunkSizeWarningLimit: 1200,
+  },
+})
